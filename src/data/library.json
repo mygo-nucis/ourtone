@@ -1,0 +1,25 @@
+[
+ {
+  "id": "ut-darkwave",
+  "title": {
+   "zh": "无声的钟楼",
+   "en": "Silent Clock Tower"
+  },
+  "latin": "Silent Clock Tower",
+  "artist": {
+   "zh": "Ourtone 原创",
+   "en": "Ourtone Originals"
+  },
+  "key": {
+   "tonic": 11,
+   "mode": "minor"
+  },
+  "meter": [
+   4,
+   4
+  ],
+  "bpm": 124,
+  "duration": 123.85,
+  "parts": 6
+ }
+]

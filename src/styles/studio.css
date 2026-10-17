@@ -1,0 +1,63 @@
+/* studio controls. day: rounded, ink on white, the MyGO blue for what is on.
+   night: chamfered plaques with hairline edges drawn as a ring (outer chamfer minus inner chamfer), crimson for what is on. */
+
+.ut-btn {
+  --c: 4px; --bc: var(--hair);
+  position: relative; isolation: isolate; display: inline-flex; align-items: center; justify-content: center; gap: 6px; flex: none;
+  height: 28px; padding: 0 12px; border-radius: 8px;
+  font: 700 12px/1 var(--f-sans); letter-spacing: 1px; color: var(--ink2); white-space: nowrap;
+  background: transparent; box-shadow: inset 0 0 0 1.2px var(--bc);
+  transition: background .15s, color .15s, box-shadow .15s, transform .15s;
+}
+.ut-btn:hover { color: var(--ink); background: var(--accentSoft); }
+.ut-btn:active { transform: translateY(1px); }
+.ut-btn:disabled { opacity: .45; pointer-events: none; }
+.ut-btn.fill { background: var(--surface); }
+.ut-btn.accent { --bc: var(--accent); color: var(--accent); }
+.ut-btn.accent:hover { background: var(--accentSoft); }
+.ut-btn.primary { --bc: transparent; color: var(--on); background: var(--accent); font-weight: 900; letter-spacing: 3px; }
+.ut-btn.primary:hover { background: var(--accentD); color: var(--on); }
+.ut-btn.on { --bc: transparent; color: var(--on); background: var(--accent); }
+/* a switched-on toggle reads quieter than a chosen tool */
+.ut-btn.lit { --bc: var(--accent); color: var(--accent); background: var(--accentSoft); }
+.ut-btn.icon { width: 28px; padding: 0; border-radius: 7px; }
+.ut-btn.lg { height: 32px; font-size: 14px; padding: 0 18px; }
+.ut-btn:focus-visible { box-shadow: inset 0 0 0 1.2px var(--bc), 0 0 0 2px var(--accent); }
+
+:root[data-sky="night"] .ut-btn {
+  border-radius: 0; box-shadow: none; background: var(--well);
+  clip-path: polygon(var(--c) 0, calc(100% - var(--c)) 0, 100% var(--c), 100% calc(100% - var(--c)), calc(100% - var(--c)) 100%, var(--c) 100%, 0 calc(100% - var(--c)), 0 var(--c));
+}
+:root[data-sky="night"] .ut-btn::before, :root[data-sky="night"] .ch-ring::before {
+  content: ''; position: absolute; inset: 0; z-index: -1; pointer-events: none; background: var(--bc);
+  clip-path: polygon(var(--c) 0, calc(100% - var(--c)) 0, 100% var(--c), 100% calc(100% - var(--c)), calc(100% - var(--c)) 100%, var(--c) 100%, 0 calc(100% - var(--c)), 0 var(--c),
+    1px calc(var(--c) + .42px), 1px calc(100% - var(--c) - .42px), calc(var(--c) + .42px) calc(100% - 1px), calc(100% - var(--c) - .42px) calc(100% - 1px),
+    calc(100% - 1px) calc(100% - var(--c) - .42px), calc(100% - 1px) calc(var(--c) + .42px), calc(100% - var(--c) - .42px) 1px, calc(var(--c) + .42px) 1px, 1px calc(var(--c) + .42px), 0 var(--c));
+}
+:root[data-sky="night"] .ut-btn:hover { background: #1A1016; }
+:root[data-sky="night"] .ut-btn.primary, :root[data-sky="night"] .ut-btn.on { background: var(--accent); }
+:root[data-sky="night"] .ut-btn.lit { background: #1E0F14; --bc: rgba(196, 41, 62, .7); color: #E36A7C; }
+:root[data-sky="night"] .ut-btn.primary:hover { background: #D23A4F; }
+:root[data-sky="night"] .ut-btn.fill { background: var(--well); }
+:root[data-sky="night"] .ut-btn:focus-visible { box-shadow: none; --bc: #D8B46A; }
+
+/* a chamfered box with a hairline ring by night, a rounded box by day */
+.ut-box { --c: 4px; --bc: var(--hair); position: relative; isolation: isolate; border-radius: 8px; box-shadow: inset 0 0 0 1.2px var(--bc); }
+:root[data-sky="night"] .ut-box {
+  border-radius: 0; box-shadow: none;
+  clip-path: polygon(var(--c) 0, calc(100% - var(--c)) 0, 100% var(--c), 100% calc(100% - var(--c)), calc(100% - var(--c)) 100%, var(--c) 100%, 0 calc(100% - var(--c)), 0 var(--c));
+}
+:root[data-sky="night"] .ut-box::before {
+  content: ''; position: absolute; inset: 0; z-index: -1; pointer-events: none; background: var(--bc);
+  clip-path: polygon(var(--c) 0, calc(100% - var(--c)) 0, 100% var(--c), 100% calc(100% - var(--c)), calc(100% - var(--c)) 100%, var(--c) 100%, 0 calc(100% - var(--c)), 0 var(--c),
+    1px calc(var(--c) + .42px), 1px calc(100% - var(--c) - .42px), calc(var(--c) + .42px) calc(100% - 1px), calc(100% - var(--c) - .42px) calc(100% - 1px),
+    calc(100% - 1px) calc(100% - var(--c) - .42px), calc(100% - 1px) calc(var(--c) + .42px), calc(100% - var(--c) - .42px) 1px, calc(var(--c) + .42px) 1px, 1px calc(var(--c) + .42px), 0 var(--c));
+}
+
+/* section labels: spaced out in Chinese, only lightly in English */
+.ut-kicker { font: 700 12px/1 var(--f-sans); letter-spacing: 3px; color: var(--muted); white-space: nowrap; }
+:root:lang(en) .ut-kicker { letter-spacing: .06em; }
+:root:lang(en) .ut-btn.primary { letter-spacing: .06em; }
+:root:lang(en) .ut-btn { letter-spacing: .02em; }
+.ut-num { font: italic 900 14px/1 var(--f-disp); font-stretch: 112%; font-variant-numeric: tabular-nums; }
+:root[data-sky="night"] .ut-num { font: 700 16px/1 var(--f-gar); font-style: normal; }

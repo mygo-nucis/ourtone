@@ -1,0 +1,68 @@
+@import './fonts.css';
+
+:root {
+  color-scheme: light;
+  --bg: #F6F8FB; --surface: #FFFFFF; --ink: #1C2030; --ink2: #474E5F; --muted: #8B93A4; --hair: #DCE2EA;
+  --accent: #2F86E8; --accent2: #95CEF3; --on: #FFFFFF; --orn: #2F86E8; --sky: #CBE8FB;
+  --f-sans: "Noto Sans SC", "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
+  --f-serif: "Noto Serif SC", "Songti SC", "STSong", serif;
+  --f-disp: "Archivo", "Noto Sans SC", system-ui, sans-serif;
+  --f-goth: "Manufacturing Consent", "Noto Serif SC", serif;
+  --f-gar: "Cormorant Garamond", "Noto Serif SC", serif;
+  --f-title: "Noto Serif SC", "Songti SC", serif;
+  --focus: 0 0 0 2px var(--bg), 0 0 0 4px var(--accent);
+  /* studio surfaces */
+  --page: #FDFDFB; --base: #FFFFFF; --p2: #F7F9FC; --alt: #FBFCFE; --well: #FFFFFF;
+  --accentD: #1E5DB6; --accentSoft: #E4F0FC; --now: #E2483F; --track: #DCE3EC; --off: #D5DCE6; --signal: #E2483F;
+  --wash: #FBE38A; --shadow: rgba(28, 32, 48, .16);
+  --thumb: rgba(28, 32, 48, .2);
+}
+:root[data-sky="night"] {
+  color-scheme: dark;
+  --bg: #0B0A0E; --surface: #16141B; --ink: #EDE6E1; --ink2: #C9C0BD; --muted: #8E8792; --hair: rgba(237, 230, 225, .12);
+  --accent: #C4293E; --accent2: #6E1422; --on: #FFF3EE; --orn: #D8B46A; --sky: #2A0F16;
+  --f-title: "Shippori Mincho B1", "Noto Serif SC", serif;
+  --page: #131117; --base: #121015; --p2: #16141B; --alt: #17151C; --well: #0E0C11;
+  --accentD: #8E1728; --accentSoft: rgba(196, 41, 62, .16); --now: #D8B46A; --track: #2A2630; --off: #2C2832; --signal: #C4293E;
+  --wash: #D8B46A; --shadow: rgba(0, 0, 0, .5);
+  --thumb: rgba(216, 180, 106, .3);
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+/* scrollbars take the sky's colours: an ink thumb by day, a gold one by night */
+* { scrollbar-color: var(--thumb) transparent; }
+[hidden] { display: none !important; }
+html, body { height: 100%; }
+body {
+  margin: 0; overflow: hidden;
+  background: var(--bg); color: var(--ink);
+  font: 400 14px/1.6 var(--f-sans);
+  -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+#app { position: fixed; inset: 0; }
+button { font: inherit; color: inherit; background: none; border: 0; padding: 0; cursor: pointer; }
+button:focus-visible, [tabindex]:focus-visible { outline: none; box-shadow: var(--focus); border-radius: 6px; }
+svg { overflow: visible; }
+.sr { position: absolute !important; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+
+/* the change of sky (theme.svelte.ts): the new sky is revealed under a soft, slightly slanted edge. dusk comes down
+   from the top while the old day dims under it; dawn comes up from below. */
+::view-transition-old(root), ::view-transition-new(root) { animation: none; mix-blend-mode: normal; }
+:root[data-sweep="dusk"]::view-transition-new(root) {
+  -webkit-mask: linear-gradient(174deg, #000 0 46.5%, transparent 53.5% 100%) 0 100% / 100% 210% no-repeat;
+  mask: linear-gradient(174deg, #000 0 46.5%, transparent 53.5% 100%) 0 100% / 100% 210% no-repeat;
+  animation: ut-sweep-down 1.15s cubic-bezier(.5, 0, .2, 1) both;
+}
+:root[data-sweep="dusk"]::view-transition-old(root) { animation: ut-dim 1.15s cubic-bezier(.5, 0, .2, 1) both; }
+:root[data-sweep="dawn"]::view-transition-new(root) {
+  -webkit-mask: linear-gradient(354deg, #000 0 46.5%, transparent 53.5% 100%) 0 0 / 100% 210% no-repeat;
+  mask: linear-gradient(354deg, #000 0 46.5%, transparent 53.5% 100%) 0 0 / 100% 210% no-repeat;
+  animation: ut-sweep-up 1.15s cubic-bezier(.5, 0, .2, 1) both;
+}
+:root[data-sweep="fade"]::view-transition-new(root) { animation: ut-fade-in .3s ease both; }
+@keyframes ut-sweep-down { from { -webkit-mask-position: 0 100%; mask-position: 0 100%; } to { -webkit-mask-position: 0 0; mask-position: 0 0; } }
+@keyframes ut-sweep-up { from { -webkit-mask-position: 0 0; mask-position: 0 0; } to { -webkit-mask-position: 0 100%; mask-position: 0 100%; } }
+@keyframes ut-dim { to { filter: brightness(.86); } }
+@keyframes ut-fade-in { from { opacity: 0; } }

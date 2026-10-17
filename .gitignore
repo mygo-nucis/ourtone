@@ -1,0 +1,11 @@
+node_modules
+dist/
+dist-single/
+tests/out/
+# the full font files (see README: Fonts); the cut-down ones in src/assets/fonts are what the site uses
+fonts-src/
+__pycache__/
+*.log
+.DS_Store
+.env*
+.vercel

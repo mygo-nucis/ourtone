@@ -1,0 +1,17 @@
+{
+  "name": "Ourtone",
+  "short_name": "Ourtone",
+  "description": "在浏览器里听歌、跟着乐队弹，编曲、设计音色，一键生成新歌。",
+  "lang": "zh-CN",
+  "start_url": "./",
+  "scope": "./",
+  "display": "fullscreen",
+  "orientation": "landscape",
+  "background_color": "#F6F8FB",
+  "theme_color": "#F6F8FB",
+  "icons": [
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}

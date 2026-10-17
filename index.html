@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#F6F8FB">
+  <title>Ourtone</title>
+  <!-- the sky is known before the first paint, so a night visit never flashes the day colours -->
+  <script>try{var s=localStorage.getItem('ut-sky');if(s!=='day'&&s!=='night')s=matchMedia('(prefers-color-scheme: dark)').matches?'night':'day';var r=document.documentElement;r.dataset.sky=s;r.style.colorScheme=s==='night'?'dark':'light';if(s==='night')document.querySelector('meta[name="theme-color"]').content='#0B0A0E'}catch(e){}
+  /* and the language: a choice from the menu, else Chinese for a browser that reads any Chinese, else English */
+  try{var l=null;try{l=localStorage.getItem('ut-lang')}catch(e){}if(l!=='zh'&&l!=='en')l=(navigator.languages&&navigator.languages.length?navigator.languages:[navigator.language]).some(function(x){return /^zh\b/i.test(x||'')})?'zh':'en';document.documentElement.lang=l==='zh'?'zh-CN':'en'}catch(e){}</script>
+  <meta name="description" content="Listen, play along with the band, arrange, shape sounds and make new songs, all in your browser. 在浏览器里听歌、跟着乐队弹，编曲、设计音色，一键生成新歌。">
+  <!-- the card a shared link shows on X, TikTok and the rest; the same for every visitor, so it speaks both languages -->
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Ourtone">
+  <meta property="og:title" content="Ourtone · the next verse is yours to play">
+  <meta property="og:description" content="Listen, play along with the band, arrange and make new songs in your browser. 在浏览器里听歌、跟乐队弹奏、编曲、生成新歌。">
+  <meta property="og:url" content="https://ourtone.fun/">
+  <meta property="og:image" content="https://ourtone.fun/og.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="Ourtone: five coloured lanes of falling notes, melody to drums, fanned out like stickers beside the line The next verse is yours to play">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='15' fill='%232F86E8'/%3E%3Crect x='13' y='22' width='38' height='3' rx='1.5' fill='%23fff'/%3E%3Cellipse cx='33' cy='36' rx='12' ry='8.4' fill='%23fff' transform='rotate(-20 33 36)'/%3E%3C/svg%3E">
+</head>
+<body>
+  <div id="app"></div>
+  <script type="module" src="/src/main.ts"></script>
+</body>
+</html>

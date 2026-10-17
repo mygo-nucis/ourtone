@@ -1,0 +1,31 @@
+{
+  "name": "Ourtone Play Test",
+  "short_name": "Ourtone Test",
+  "description": "PlayMode performance test with the retained GPU renderer and Normal motion.",
+  "lang": "en",
+  "start_url": "./?perf&playRenderer=retained&playProbe=normal",
+  "scope": "./",
+  "display": "fullscreen",
+  "orientation": "landscape",
+  "background_color": "#F6F8FB",
+  "theme_color": "#F6F8FB",
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    },
+    {
+      "src": "icon-maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "id": "./?home=playtest-retained"
+}

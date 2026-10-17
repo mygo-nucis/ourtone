@@ -1,0 +1,67 @@
+# The changelog in the ··· menu. Newest first; keep it short.
+#
+#   A line with a date (YYYY-MM-DD) starts a version.
+#   Each change is two lines: "- " and the Chinese, then an indented line with the English.
+#   Lines starting with # are notes like this one and are not shown.
+#
+# After editing, rebuild (or deploy) for it to show on the site.
+
+2026-10-17
+- 代码已开源（https://github.com/mygo-nucis/ourtone），欢迎互动！
+  Source code is now open-source (https://github.com/mygo-nucis/ourtone). Contributions welcome!
+- 优化多轨演奏的音符分轨逻辑
+  Improved note-to-lane allocation in Multi-Track Play
+- 修复移动端 MIDI 导入 bug
+  Fixed a MIDI import bug on mobile
+
+2026-10-15
+- iOS性能优化，更换底层（开发者已与Astra大战一天一夜至力竭，音频实时合成负载难以降低，若仍卡顿推荐使用PC体验）
+  Improved iOS performance with an overhauled rendering backend (The developer and Astra battled through an entire day and night and are now utterly exhausted. If it still stutters, we recommend playing on PC.)
+
+2026-10-13
+- 新增 15 首内置曲目
+  Added 15 new built-in songs
+- 长按音符新增结尾判定
+  Added hold-note end judgments
+- 演奏模式新增「简化琶音」选项
+  Added "Simplify Arpeggios" to Play Mode
+- 优化编曲拖放、视图逻辑
+  Improved editing and navigation in Arrange view
+- 支持调整曲库顺序
+  Added song reordering
+
+2026-10-12
+- 新增多轨演奏：可同时选择多个声部，合并为一张谱面演奏（取代原「节奏游戏」入口）
+  Added Multi-Track Play: pick several parts and play them together on one chart (replaces the Rhythm Game button)
+- 演奏模式新增「按原曲播放」选项：音乐准时播放，不受按键失误影响
+  Added "Play as written" to Play Mode: the music plays on time, whatever you press
+- 新增延音踏板功能
+  Added sustain pedal support
+- 优化编曲界面弹奏延迟
+  Reduced note playback latency in Studio
+- 平衡鼓组音量
+  Improved drum volume balance
+
+2026-10-11
+- 全局音符下落速度提高至 1.2 倍
+  Note scroll speed increased by 20% across the site
+- 优化琶音演奏逻辑，附属音符现在跟随玩家按键触发
+  Rolled-chord notes now follow the player's keypress
+- 修复长按音符时误触发空按音效的问题
+  Fixed unintended empty-keypress sounds during hold notes
+- 优化木吉他、古典吉他及弦乐组音色；改善短音符起音，Hornet 尤为明显
+  Improved acoustic/nylon guitar and string sounds; clearer short-note attacks, especially in Hornet
+
+2026-10-09
+- 优化手机端演奏模式：轨道加宽、音符增高、渲染负载降低
+  Improved mobile Play Mode: wider lanes, taller notes, lower rendering load
+- 修复 iPhone 刘海区域遮挡界面的问题
+  Fixed UI elements being obscured by the iPhone notch
+- 修复日夜主题下音符视觉速度及轨道宽度不一致的问题
+  Fixed inconsistent perceived note speed and lane width between themes
+
+2026-10-08
+- 修复移动端演奏模式轨道显示不完整的问题
+  Fixed clipped lanes in mobile Play Mode
+- 新增三首 Demo 曲目
+  Added three demo songs
