@@ -10,6 +10,12 @@ Ourtone features two visual themes, Day and Night, inspired by MyGO!!!!! and Ave
 
 ![Ourtone screenshots: the Stage, Play Mode, the Studio's arrangement view and sound view](docs/screenshots.jpg)
 
+<details>
+<summary>🌙 Show the Night theme screenshots</summary>
+<br>
+<img src="docs/screenshots-night.jpg" alt="Ourtone Night theme screenshots: the Stage, Play Mode, the Studio's arrangement view and sound view">
+</details>
+
 ## Features
 
 - **Rhythm Game**: Click any track on the homepage to enter Play Mode, or select multiple tracks to play them together. By default, note playback follows the player's actual input timing. Supports touch and slide controls on mobile devices.
@@ -83,4 +89,4 @@ The fonts in `src/assets/fonts/` are cut down to the characters the site uses. A
 
 - Code: [MIT License](LICENSE).
 - Fonts in `src/assets/fonts/`: [SIL Open Font License 1.1](src/assets/fonts/OFL.txt).
-- This is a non-commercial fan project, not affiliated with MyGO!!!!!, Ave Mujica, BanG Dream! or their rights holders. Those names belong to their owners and are not covered by this repository's licenses.
+- This is a non-commercial fan project, not affiliated with MyGO!!!!!, Ave Mujica, BanG Dream!, Our Notes or their rights holders. Those names belong to their owners and are not covered by this repository's licenses.

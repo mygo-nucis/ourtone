@@ -3,12 +3,18 @@
 简体中文 · [English](README.en.md)
 
 一个纯前端的编曲&音游网站，支持将任意 MIDI 音轨作为谱面游玩，内置基础DAW功能。
-美术风格方面，网站支持白昼与夜幕两套主题，分别借鉴了 MyGO/Ave Mujica 风格。
+网站支持白昼与夜幕两套主题，分别借鉴了 MyGO/Ave Mujica 风格。
 
 - **网站（vercel海外部署）**：<https://ourtone.fun>
 - **中国大陆用户**推荐使用哔哩哔哩版本，访问更稳定：<https://www.bilibili.com/toy/ourtone>
 
 ![Ourtone 截图：舞台、演奏模式、录音室编曲视图、音色视图](docs/screenshots.jpg)
+
+<details>
+<summary>🌙 查看夜幕主题截图</summary>
+<br>
+<img src="docs/screenshots-night.jpg" alt="Ourtone 夜幕主题截图：舞台、演奏模式、录音室编曲视图、音色视图">
+</details>
 
 ## 功能
 
@@ -81,4 +87,4 @@ node tests/out/gen.js     # 生成器检查
 
 - 代码使用 [MIT 许可证](LICENSE)。
 - `src/assets/fonts/` 中的字体使用 [SIL Open Font License 1.1](src/assets/fonts/OFL.txt)。
-- 这是一个非商业的同人项目，与 MyGO!!!!!、Ave Mujica、BanG Dream! 及其版权方没有关联。相关名称归各自的权利人所有，不在本仓库的许可范围内。
+- 这是一个非商业的同人项目，与 MyGO!!!!!、Ave Mujica、BanG Dream!、Our Notes 及其版权方没有关联。相关名称归各自的权利人所有，不在本仓库的许可范围内。
