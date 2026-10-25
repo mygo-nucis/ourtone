@@ -6,6 +6,12 @@
 #
 # After editing, rebuild (or deploy) for it to show on the site.
 
+2026-10-26
+- 多轨谱面支持两种生成方式
+  Added two chart generation modes for Multi-Track Play
+- 演奏模式支持按键音常开
+  Added an option to always play key sounds in Play Mode
+
 2026-10-17
 - 代码已开源（https://github.com/mygo-nucis/ourtone），欢迎互动！
   Source code is now open-source (https://github.com/mygo-nucis/ourtone). Contributions welcome!

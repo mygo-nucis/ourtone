@@ -1,6 +1,6 @@
 /* play mode's charts for every built-in song: a hold never runs into the next note to play, and lanes never get a
-   note while that lane is still held (nor, with arpeggios not simplified, a note within a lane's gap of the last). multi-track: every part of a song at once, and the melody with each other part (in bands of lanes),
-   never puts a note on a lane still held, two notes a step apart (too close to play), or four keys at once. a part's
+   note while that lane is still held (nor, with arpeggios not simplified, a note within a lane's gap of the last). multi-track: every part of a song at once, and the melody with each other part (all on the six lanes, and in bands of
+   lanes), never puts a note on a lane still held, two notes a step apart (too close to play), or four keys at once. a part's
    passages marked for holds hold every note written long enough there, and none elsewhere. run: vite build -c vite.test.config.ts && node tests/out/chart.js */
 import fs from 'node:fs';
 import { prepareSong } from '../src/lib/music/song';
@@ -10,7 +10,7 @@ import type { SongData } from '../src/lib/music/types';
 const DIR = 'src/data/songs';
 let bad = 0;
 const oneHand = [0, 0];
-let total = 0, mins = 0, turns = 0, shortest = Infinity;
+let total = 0, totalShared = 0, mins = 0, turns = 0, shortest = Infinity;
 for (const f of fs.readdirSync(DIR).filter(f => f.endsWith('.json'))) {
   const song = prepareSong(JSON.parse(fs.readFileSync(`${DIR}/${f}`, 'utf-8')) as SongData);
   const rows: string[] = [];
@@ -57,9 +57,9 @@ for (const f of fs.readdirSync(DIR).filter(f => f.endsWith('.json'))) {
   const P = song.parts.filter(p => !p.audio && p.n), mel = P.find(p => p.data.role === 'melody') ?? P[0];
   const combos = [P, ...(P.length > 2 ? P.filter(p => p !== mel).map(p => [mel, p]) : [])];
   const multi: string[] = [];
-  for (const c of combos) {
+  for (const c of combos) for (const split of [true, false]) {
     if (c.length < 2) continue;
-    const { notes } = buildCharts(c, 3), held = new Float64Array(6).fill(-1);
+    const { notes } = buildCharts(c, 3, true, split), held = new Float64Array(6).fill(-1);
     let flam = 0, crowd = 0, clash = 0;
     for (let i = 0; i < notes.length; i++) {
       const n: ChartNote = notes[i];
@@ -70,6 +70,11 @@ for (const f of fs.readdirSync(DIR).filter(f => f.endsWith('.json'))) {
       if (tog > 3) crowd++;
     }
     bad += flam + crowd + clash;
+    if (!split) {
+      totalShared += notes.length;
+      if (flam + crowd + clash || c.length === P.length) multi.push(`${c.length === P.length ? 'all' : c.map(p => p.data.id).join('+')} shared: ${notes.length} notes, flams ${flam}, crowds ${crowd}, clashes ${clash}`);
+      continue;
+    }
     // how much of it is played with one hand: two-second spans with a few notes, all on S D F or all on J K L
     let spans = 0, one = 0;
     for (let t = notes.length ? notes[0].t : 0, k = 0; notes.length && t < notes[notes.length - 1].t; t += .5) {
@@ -96,6 +101,6 @@ for (const f of fs.readdirSync(DIR).filter(f => f.endsWith('.json'))) {
   }
   console.log(f.replace('.json', ''), '\n  ' + rows.join('\n  ') + '\n  multi-track ' + multi.join('; '));
 }
-console.log(`multi-track: ${total} notes, one hand ${Math.round(oneHand[0] / oneHand[1] * 100)}% of the time; ${(turns / mins).toFixed(1)} band changes a minute, the shortest ${shortest.toFixed(1)} s`);
+console.log(`multi-track: ${totalShared} notes on shared lanes; in bands ${total} notes, one hand ${Math.round(oneHand[0] / oneHand[1] * 100)}% of the time; ${(turns / mins).toFixed(1)} band changes a minute, the shortest ${shortest.toFixed(1)} s`);
 console.log(bad ? `FAIL ${bad}` : 'ok');
 process.exit(bad ? 1 : 0);

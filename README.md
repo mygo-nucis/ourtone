@@ -30,7 +30,7 @@
 
 ## 开发方式
 
-这个项目完全通过 vibe coding 完成：代码主要由 **Claude Opus 5.5** 编写，**GPT-6.1 Sol** 和 **GPT-6 Astra** 参与了性能优化。
+本项目完全通过 vibe coding 完成：代码主要由 **Claude Opus 5.5** 编写，**GPT-6.1 Sol** 和 **GPT-6 Astra** 参与了性能优化。
 
 ## 已知性能问题
 

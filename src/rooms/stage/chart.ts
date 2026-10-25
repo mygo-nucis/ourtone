@@ -20,7 +20,9 @@ import { lowerBound } from '../../lib/util';
    only when that leaves it long enough to feel held (`HOLD`), so notes a beat apart at a brisk tempo are all taps;
    a part can mark stretches by hand (its `holds`, ticks) where a note written that long is held anyway, to just
    before the next one.
-   several parts at once (multi-track play) share the six lanes: each gets a band of them, by register (drums at the
+   several parts at once (multi-track play) share the six lanes. by default each part spreads over all six as it would
+   on its own; they are merged, the melody first, and a note whose lane is taken moves to the nearest free one (nearer
+   the middle first) before it is left to the band. or (`split`) each gets a band of them, by register (drums at the
    left, then low to high), so two parts are two hands (S D F, J K L), three get two lanes each, and more overlap a
    little. the bands follow who is playing: the song is cut into stretches by the parts that play in them (a part
    silent for `IDLE` or longer is out until it comes back; a stretch shorter than `STRETCH` joins a neighbour, its parts
@@ -51,6 +53,7 @@ export interface ChartNote {
   after: { i: number; dt: number; pitch: number; vel: number; dur: number }[];
 }
 
+const NEAR = [0, 1, -1, 2, -2, 3, -3, 4, -4, 5, -5];
 const TOGETHER = .03, MIN_GAP = .1, LANE_GAP = .14, LOOK = 3, HOLD_GAP = .15;
 /** a hold at least this long (seconds); one the part marks, at least `HELD` */
 export const HOLD = .42;
@@ -213,9 +216,10 @@ export function stretches(parts: Part[]): { t: number; on: number[] }[] {
 }
 
 /** one chart for several parts (see above); `most` keys pressed at once at most; `simplify` as for one part (a part's
-    own notes are then never too close to each other, only to another part's) */
-export function buildCharts(parts: Part[], most = 3, simplify = true): { notes: ChartNote[]; skip: Map<number, Set<number>> } {
+    own notes are then never too close to each other, only to another part's); `split`: a band of lanes each */
+export function buildCharts(parts: Part[], most = 3, simplify = true, split = false): { notes: ChartNote[]; skip: Map<number, Set<number>> } {
   if (parts.length === 1) { const c = buildChart(parts[0], undefined, simplify); return { notes: c.notes, skip: new Map([[parts[0].index, c.skip]]) }; }
+  if (!split) return assemble(parts, [{ t: 0, bands: new Map(parts.map(p => [p.index, { a: 0, w: LANES }])) }], most, simplify, true);
   return assemble(parts, lanePlan(parts, most, simplify), most, simplify);
 }
 
@@ -264,8 +268,9 @@ function byShare(parts: Part[], segs: { t: number; on: number[] }[], notes: Char
   return wins.filter((w, k) => !k || w.key !== wins[k - 1].key);
 }
 
-/** the parts charted in the bands they have from each time on (`plan`), and merged (see above) */
-function assemble(parts: Part[], plan: { t: number; bands: Map<number, Band> }[], most: number, simplify: boolean): { notes: ChartNote[]; skip: Map<number, Set<number>> } {
+/** the parts charted in the bands they have from each time on (`plan`), and merged (see above); `shared`: a note whose
+    lane is taken tries the others, nearest first */
+function assemble(parts: Part[], plan: { t: number; bands: Map<number, Band> }[], most: number, simplify: boolean, shared = false): { notes: ChartNote[]; skip: Map<number, Set<number>> } {
   // each part charted in the band it has in each stretch (a part charted once per band it gets), its notes taken
   // from the chart of the stretch they fall in; a note that already sounds with one before it is not taken again
   const byIndex = new Map(parts.map(p => [p.index, p]));
@@ -305,11 +310,20 @@ function assemble(parts: Part[], plan: { t: number; bands: Map<number, Band> }[]
     let together = 0, close = false;
     for (let q = i; q < j; q++) { if (Math.abs(times[q] - c.t) <= TOGETHER) together++; else if (simplify || owner[q] !== c.part) close = true; }
     if (close || together >= most) continue;
-    // its lane is free: no note there within a lane's gap, and not under a held note there
-    const ln = lanes[c.lane], at = lowerBound(ln.map(x => x.t), c.t);
-    const prev = ln[at - 1], nx = ln[at];
-    if (prev && (c.t - prev.t < LANE_GAP || c.t < prev.hold + HOLD_GAP)) continue;
-    if (nx && nx.t - c.t < LANE_GAP) continue;
+    // its lane is free: no note there within a lane's gap, and not under a held note there (shared lanes: or the nearest
+    // free lane, nearer the middle first)
+    const tries = shared ? NEAR.map(d => c.lane + (c.lane < LANES / 2 ? d : -d)).filter(l => l >= 0 && l < LANES) : [c.lane];
+    let free = -1, at = 0, ln: ChartNote[] = [];
+    for (const l of tries) {
+      ln = lanes[l]; at = lowerBound(ln.map(x => x.t), c.t);
+      const prev = ln[at - 1], nx = ln[at];
+      if (prev && (c.t - prev.t < LANE_GAP || c.t < prev.hold + HOLD_GAP)) continue;
+      if (nx && nx.t - c.t < LANE_GAP) continue;
+      free = l; break;
+    }
+    if (free < 0) continue;
+    c.lane = free;
+    const nx = ln[at];
     // (a hold ends short of the next note on its lane)
     if (nx) { c.hold = Math.max(c.t, Math.min(c.hold, nx.t - HOLD_GAP)); c.long = c.long && longOf(c); }
     const at2 = lowerBound(times, c.t);

@@ -14,7 +14,9 @@
   import PartChip from '../../components/ui/PartChip.svelte';
   import SpeedControl from './SpeedControl.svelte';
   import Toggle from '../../components/ui/Toggle.svelte';
+  import Seg from '../../components/ui/Seg.svelte';
   import { playopts } from './playopts.svelte';
+  import { HIT_SOUNDS } from '../../lib/audio/hitsounds';
   import { partColor, mixHex } from '../../lib/art/palette';
   import { NS, archD } from '../../lib/art/svg';
   import { transport } from '../../lib/audio/transport.svelte';
@@ -27,11 +29,11 @@
 
   /* play mode. the chosen window lifts off the stage, tips back in 3D and becomes the floor of a lane highway: the
      same glass, now seen in perspective, with its notes gliding into six lanes (S D F · J K L). the stage stays behind
-     it, dimmed. a hit sounds the written notes exactly; a press with nothing to hit is a soft tap. long notes are held:
+     it, dimmed. a hit sounds the written notes exactly (and, with key sounds on, a hit sound of its own: hitsounds.ts); a press with nothing to hit is a soft tap. long notes are held:
      the head stays on the line while the tail runs into it, and its end is judged too. light judgements and a combo count. Escape, the back
      button or a click off the highway lays the window back in its place.
-     several parts can be played at once (multi-track): their notes share the highway (chart.ts gives each a band of
-     lanes) and wear their parts' colours; the window that tips back is the lead part's, the others' notes join it */
+     several parts can be played at once (multi-track): their notes share the highway (all six lanes each, or a band of
+     lanes each: chart.ts) and wear their parts' colours; the window that tips back is the lead part's, the others' notes join it */
   let { L, song, parts, lead, onexit }: { L: StageLayout; song: Song; parts: number[]; lead: number; onexit: () => void } = $props();
 
   const P = untrack(() => song.parts[lead]);
@@ -40,7 +42,7 @@
   /** at most this many keys at once: two thumbs on a touch screen */
   const most = typeof matchMedia !== 'undefined' && matchMedia('(pointer: coarse)').matches ? 2 : 3;
   // (a let: turning arpeggio simplification on or off charts the part again, see rechart)
-  let chart = untrack(() => buildCharts(PS, most, playopts.simplify));
+  let chart = untrack(() => buildCharts(PS, most, playopts.simplify, playopts.split));
   let notes: ChartNote[] = chart.notes;
   const drumParts = new Set(PS.filter(p => p.drums).map(p => p.index));
   const isDrum = (n: ChartNote) => drumParts.has(n.part);
@@ -241,7 +243,7 @@
   function setSimplify(v: boolean) {
     playopts.setSimplify(v);
     const from = transport.playing ? transport.scheduled : transport.now();
-    chart = buildCharts(PS, most, v); notes = chart.notes; tied = tiesOf(notes);
+    chart = buildCharts(PS, most, v, playopts.split); notes = chart.notes; tied = tiesOf(notes);
     judged = new Int8Array(notes.length); hitAt = new Float64Array(notes.length); dropped = new Uint8Array(notes.length); dropT = new Float64Array(notes.length);
     holding.fill(-1);
     const mine = new Map([...chart.skip].map(([k, x]) => [k, new Set(x)]));
@@ -252,6 +254,15 @@
     transport.setSkip(playopts.exact ? null : theirs);
     hook();
   }
+  /* the hit sounds: off or one of three, and their volume (a short slider beside them while one is on); a sound picked,
+     or the volume let go, is heard at once */
+  const hitItems = $derived([{ id: '0', label: i18n.t('keySoundsOff') }, ...Array.from({ length: HIT_SOUNDS }, (_, i) => ({ id: String(i + 1), label: String(i + 1) }))]);
+  async function hearHit() { if (!playopts.hitSound) return; await engine.unlock(); transport.hitSound(playopts.hitSound, playopts.hitVol); }
+  function pickHit(v: number) { playopts.setHitSound(v); void hearHit(); }
+  let volDrag = false;
+  function volAt(e: PointerEvent) { const r = (e.currentTarget as HTMLElement).getBoundingClientRect(); playopts.setHitVol(clamp((e.clientX - r.left - 6) / (r.width - 12), 0, 1)); }
+  function volDown(e: PointerEvent) { volDrag = true; (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId); volAt(e); }
+  function volUp() { if (!volDrag) return; volDrag = false; void hearHit(); }
   /** what a test reads (window.__play): the chart and the run so far */
   function hook() { (window as unknown as { __play: unknown }).__play = { notes, tally, combo: () => combo, m: () => m, down: () => down.map(Number).join(''), lane: (l: number) => proj(laneX(l), hitNow), render: renderStats, geo: () => ({ top: G.run, vis: G.top, hit: hitNow, x: laneX(LANES / 2), span, s: L.s, proj, lw: G.lw, k: G.k, Q: G.Q, lay: G.lay }) }; }
   const visualClock = pictureClock(), pacedClock = pacedPictureClock();
@@ -302,6 +313,7 @@
           if (n.t >= bandUntil) n.pitches.forEach((p, k) => transport.strike(n.part, p, n.vels[k], n.durs[k]));
           for (const a of n.after) if (n.t + a.dt >= bandUntil) transport.strike(n.part, a.pitch, a.vel, a.dur, a.dt);
         }
+        if (playopts.hitSound && !hitSoundOff()) transport.hitSound(playopts.hitSound, playopts.hitVol);
         judge = { k: bestD <= PERFECT ? 'perfect' : 'good', at: performance.now() };
         tally[judge.k]++;
         combo++; comboAt = performance.now();
@@ -1275,6 +1287,18 @@
     <span class="kl">{i18n.t('exact')}</span>
     <Toggle on={playopts.exact} label={i18n.t('exact')} onchange={setExact} />
   </div>
+  <!-- a sound of its own on a hit: off, 1, 2 or 3 (each heard as it is picked), and while one is on, its volume -->
+  <div class="exact" title={i18n.t('keySoundsHint')}>
+    <span class="kl">{i18n.t('keySounds')}</span>
+    <Seg items={hitItems} value={String(playopts.hitSound)} onchange={(v) => pickHit(+v)} h={22} fs={night ? 13 : 11} pad={7} label={i18n.t('keySounds')} />
+    {#if playopts.hitSound}
+      <div class="vol" role="slider" tabindex="-1" aria-label={i18n.t('keySoundsVol')} aria-valuemin="0" aria-valuemax="100" aria-valuenow={Math.round(playopts.hitVol * 100)} title={i18n.t('keySoundsVol')}
+        onpointerdown={volDown} onpointermove={(e) => { if (volDrag) volAt(e); }} onpointerup={volUp} onpointercancel={volUp}>
+        <div class="vt"><div class="vf" style="width:{playopts.hitVol * 100}%"></div></div>
+        <div class="vk" style="left:calc(6px + {playopts.hitVol} * (100% - 12px))"></div>
+      </div>
+    {/if}
+  </div>
   {#if !coarse}
     <!-- the six keys: click one, then press the key to use instead -->
     <div class="keys" role="group" aria-label={i18n.t('playKeys')} title={i18n.t('keysHint')}>
@@ -1357,6 +1381,14 @@
     background: #FFFFFF; box-shadow: inset 0 0 0 1.3px var(--muted); cursor: pointer; transition: color .15s, background .15s, box-shadow .15s;
   }
   .cap:nth-child(4) { margin-left: 6px; }
+  /* the key sounds' volume: a short slot, filled to the level, with a round cap (a square one by night) */
+  .vol { position: relative; width: 64px; height: 20px; flex: none; cursor: pointer; touch-action: none; }
+  .vt { position: absolute; left: 6px; right: 6px; top: 8.5px; height: 3px; border-radius: 2px; background: #D5DCE6; overflow: hidden; }
+  .vf { height: 100%; background: var(--accent); }
+  .vk { position: absolute; top: 4px; width: 12px; height: 12px; margin-left: -6px; border-radius: 50%; background: #FFFFFF; box-shadow: 0 0 0 1.5px var(--accent), 0 1px 3px rgba(28, 32, 48, .2); }
+  .night .vt { border-radius: 0; background: rgba(237, 230, 225, .2); }
+  .night .vf { background: #C4293E; }
+  .night .vk { border-radius: 0; transform: rotate(45deg) scale(.85); background: #FFF3EE; box-shadow: 0 0 0 1px #D8B46A; }
   .cap:hover { color: var(--accent); box-shadow: inset 0 0 0 1.3px var(--accent); }
   .cap.on { background: var(--accent); box-shadow: inset 0 0 0 1.3px var(--accent); animation: wait 1s ease-in-out infinite; }
   @keyframes wait { 50% { opacity: .45; } }

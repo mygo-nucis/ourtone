@@ -7,6 +7,7 @@ import type { Voice } from './voices';
 import { preparePart, songDuration, type Part, type Song } from '../music/song';
 import type { Mix, PartData, SongData } from '../music/types';
 import { lowerBound } from '../util';
+import { hitSamples, hitLevel, HIT_GAIN } from './hitsounds';
 
 /* plays a song: one strip per part (see strip.ts), notes scheduled a little ahead by a worker-driven clock.
    a session is one playthrough of a part: voices -> gate -> the part's strip, faded out as a whole on stop. */
@@ -351,6 +352,21 @@ class Transport {
     lp.type = 'lowpass'; lp.frequency.value = 6000;
     g.gain.value = .2;
     src.connect(bp).connect(lp).connect(g).connect(bus.dry); src.start(t);
+  }
+  /** a hit's own sound (play mode's key sounds, 1-3: hitsounds.ts), over the note it plays, at the player's volume (0-1) */
+  private hitBufs = new Map<number, AudioBuffer>();
+  hitSound(kind: number, vol = .5) {
+    const ctx = engine.ctx, bus = engine.bus;
+    if (!ctx || !bus || !HIT_GAIN[kind] || vol <= 0) return;
+    let b = this.hitBufs.get(kind);
+    if (!b || b.sampleRate !== ctx.sampleRate) {
+      const x = hitSamples(kind, ctx.sampleRate);
+      b = ctx.createBuffer(1, x.length, ctx.sampleRate); b.getChannelData(0).set(x);
+      this.hitBufs.set(kind, b);
+    }
+    const src = ctx.createBufferSource(), g = ctx.createGain();
+    src.buffer = b; g.gain.value = HIT_GAIN[kind] * hitLevel(vol);
+    src.connect(g).connect(bus.dry); src.start(ctx.currentTime + .005);
   }
   /** render a part's sound for these pitches (Studio's keyboards: ahead of time, and before a live note, so a key's
       first press sounds, a moment late at worst, instead of not at all) */

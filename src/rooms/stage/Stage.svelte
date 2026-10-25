@@ -15,6 +15,7 @@
   import StageTransport from './StageTransport.svelte';
   import MultiDoor from './MultiDoor.svelte';
   import { recall, keep } from './picks';
+  import { playopts } from './playopts.svelte';
   import { fade } from 'svelte/transition';
   import SongList from './SongList.svelte';
   import SpeedControl from './SpeedControl.svelte';
@@ -200,6 +201,16 @@
       {/if}
     {/if}
     <MultiDoor {L} {picking} count={picked.size} onclick={onmulti} />
+    {#if picking}
+      <!-- how the picked parts share the lanes: by the Multi-Track button, under it (a phone's has no room below: over it) -->
+      {@const at = L.compact ? { x: L.multi.x + 2, y: L.multi.y - 50 } : { x: L.multi.x + 2, y: L.multi.y + L.multi.h + 14 }}
+      <button class="split" class:night={theme.night} class:compact={L.compact} role="checkbox" aria-checked={playopts.split} title={i18n.t('multiSplitHint')}
+        style="left:{at.x}px;top:{at.y}px" onclick={() => playopts.setSplit(!playopts.split)} transition:fade={{ duration: 220 }}>
+        <span class="box" class:on={playopts.split}>
+          {#if playopts.split}<svg viewBox="0 0 12 12" width="11" height="11" aria-hidden="true"><path d="M1.8 6.3 4.8 9.2 10.3 2.9" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" /></svg>{/if}
+        </span>{i18n.t('multiSplit')}
+      </button>
+    {/if}
     <svg class="hint" width={L.W} height={L.H} viewBox="0 0 {L.W} {L.H}"><SpeedControl {L} /></svg>
     {#if L.tag && extra > 0}
       {#if L.compact}
@@ -234,6 +245,20 @@
   .dim.night { background: rgba(5, 4, 7, .7); }
   .hint.top { z-index: 6; }
   .tag.over, .badge.over { z-index: 7; }
+  .split {
+    position: absolute; z-index: 7; display: flex; align-items: center; gap: 9px; padding: 4px 3px; white-space: nowrap;
+    font: 700 12px/1 var(--f-sans); letter-spacing: 1px; color: var(--ink); cursor: pointer;
+  }
+  .split.compact { font-size: 14px; padding: 8px 3px; }
+  .box {
+    width: 16px; height: 16px; display: grid; place-items: center; flex: none; border-radius: 4px; color: #FFFFFF;
+    background: #FFFFFF; box-shadow: inset 0 0 0 1.6px var(--ink);
+  }
+  .box.on { background: var(--accent); box-shadow: inset 0 0 0 1.6px var(--accent); }
+  .split:hover .box:not(.on) { box-shadow: inset 0 0 0 1.6px var(--accent); }
+  .split.night { font: 600 15px/1 var(--f-gar); letter-spacing: .3px; }
+  .split.night .box { border-radius: 0; background: rgba(11, 10, 14, .7); box-shadow: inset 0 0 0 1px rgba(216, 180, 106, .6); color: #FFF3EE; }
+  .split.night .box.on { background: #C4293E; box-shadow: inset 0 0 0 1px #D8B46A; }
   .tag {
     position: absolute; transform: rotate(4deg); padding: 9px 16px;
     font: 700 16px/1 var(--f-sans); color: #1C2030; background: #FFFFFF;
